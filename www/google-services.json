@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "590227676120",
+    "firebase_url": "https://utd-pmi.firebaseio.com",
+    "project_id": "utd-pmi",
+    "storage_bucket": "utd-pmi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590227676120:android:d761a8ab8dfa766852b0ad",
+        "android_client_info": {
+          "package_name": "com.skripsi.pmi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "590227676120-eb45p1s70m255q00dj2cdaanhf9sdukf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDShSojVHpaF6W-BOIDxKtwmpaXF7nR68I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "590227676120-eb45p1s70m255q00dj2cdaanhf9sdukf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

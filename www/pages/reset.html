@@ -1,0 +1,222 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left"><a class="back"><i class="icon f7-icons">chevron_left</i>Kembali</a></div>
+                <div class="title">Reset Password</div>
+            </div>
+        </div>
+        <div class="page-content login-screen-content">
+            {{#js_if "this.mode == 'reset'"}}
+            <div class="login-screen-title">
+                <p><i class="icon f7-icons size-besar">lock</i></p>
+                Silahkan Reset Password Anda Disini
+            </div>
+            <form id="resetForm">
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Email</div>
+                                <div class="item-input-wrap">
+                                    <input type="email" name="email" id="email" placeholder="Masukkan email" required
+                                        validate>
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="block">
+                    <a class="col-100 medium-50 button button-fill button-round" href="#" @click="reset">Kirim</a>
+                </div>
+            </form>
+            {{/js_if}}
+            {{#js_if "this.mode === 'kodereset'"}}
+            <div class="login-screen-title">
+                <p><i class="icon f7-icons size-besar">lock</i></p>
+                Kode Reset Berhasil Dikirim
+            </div>
+            <form id="koderesetForm">
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Kode Reset</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="kode" id="kode" placeholder="Masukkan kode reset" required
+                                        validate data-error-message="Kode reset belum diisi">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="block">
+                    <a class="col-100 medium-50 button button-fill button-round" href="#" @click="kodeReset">Kirim</a>
+                </div>
+            </form>
+            {{/js_if}}
+            {{#js_if "this.mode === 'password'"}}
+            <div class="login-screen-title">
+                <p><i class="icon f7-icons size-besar">lock_open</i></p>
+                Silahkan Ubah Password Anda
+            </div>
+            <form id="passwordForm">
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Password Baru</div>
+                                <div class="item-input-wrap">
+                                    <input type="password" name="password" id="password" placeholder="Masukkan password"
+                                        required validate>
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="block">
+                    <a class="col-100 medium-50 button button-fill button-round" href="#"
+                        @click="resetPassword">Submit</a>
+                </div>
+            </form>
+            {{/js_if}}
+        </div>
+    </div>
+</template>
+<style>
+    .size-besar {
+        font-size: 70px
+    }
+</style>
+<script>
+    // script must return component object
+    return {
+        data: function () {
+            return {
+                mode: 'reset'
+            }
+        },
+        methods: {
+            checkFormValidate: function () {
+                const form = $$('#resetForm');
+                const email = $$('#email').val();
+
+                let res = true;
+
+                if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+                    const cek = formProses.cekData('user', [{
+                        name: 'email'
+                    }, {
+                        value: email
+                    }]);
+
+                    if (!JSON.parse(cek.response)) {
+                        this.markInputAsError(form, 'email', 'Email tidak terdaftar');
+                        res = false;
+                    }
+                }
+
+                app.preloader.hide();
+                return res;
+            },
+            markInputAsError: function (componentEl, inputName, message) {
+                var self = this;
+                var
+                    el = componentEl.find('input[name="' + inputName + '" ]');
+                el.addClass('input-invalid');
+                el.parent().parent().parent().addClass('item-input-with-error-message item-input-invalid');
+                if (!el.next('.item-input-error-message').length) {
+                    self.$('<div class="item-input-error-message">' +
+                        message + '</div>').insertAfter(el);
+                } else {
+                    el.next('.item-input-error-message').html(message);
+                }
+            },
+            reset: function () {
+                let self = this;
+                const form = $$('#resetForm');
+
+                app.preloader.show();
+
+                if (this.checkFormValidate() && form[0].checkValidity()) {
+                    const data = app.form.convertToData('#resetForm');
+
+                    app.request({
+                        type: "POST",
+                        url: `${URL}reset/`,
+                        dataType: 'json',
+                        data: data,
+                        beforeSend: () => {
+                            app.dialog.preloader('Mengirim email...');
+                        },
+                        success: (res) => {
+                            app.dialog.close();
+
+                            if (res[0]) {
+                                self.$setState({
+                                    mode: 'kodereset'
+                                });
+                            } else {
+                                app.dialog.alert(res[1], 'Gagal');
+                            }
+                        },
+                        error: (err) => {
+                            alert(err)
+                            app.dialog.close();
+                            app.dialog.preloader('Tidak dapat terhubung ke server...');
+                        }
+                    })
+                }
+            },
+            kodeReset: function () {
+                let self = this;
+                const form = $$('#koderesetForm');
+
+                if (form[0].checkValidity()) {
+                    const data = app.form.convertToData('#koderesetForm');
+
+                    app.preloader.show();
+                    formProses.getData(data, 'cekKodeReset', 'POST').then(res => {
+                        app.preloader.hide();
+                        if (res.data.valid) {
+                            self.$setState({
+                                mode: 'password',
+                                email: res.data.email
+                            });
+                        } else {
+                            app.dialog.alert('Kode reset tidak valid', 'Gagal');
+                        }
+                    })
+
+                }
+            },
+            resetPassword: function () {
+                let self = this;
+                const form = $$('#passwordForm');
+
+                if (form[0].checkValidity()) {
+                    const data = app.form.convertToData('#passwordForm');
+                    const where = {
+                        email: this.email
+                    }
+
+                    app.preloader.show();
+                    formProses.update('user', data, where).then(res => {
+                        app.preloader.hide();
+                        mainView.router.back();
+                        if (res.data[0]) {
+                            app.dialog.alert('Password berhasil diubah', 'Informasi');
+                        } else {
+                            app.dialog.alert('Password gagal diubah', 'Gagal');
+                        }
+                    })
+
+                }
+            }
+        }
+    }
+</script>

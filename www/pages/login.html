@@ -1,0 +1,90 @@
+<template>
+    <div class="page login-screen-page" data-name="login">
+        <div class="page-content login-screen-content">
+            <div class="login-screen-title">
+                <p><img src="./assets/logo.png" width="100"></p>
+                Aplikasi Unit Transfusi Darah <br>Palang Merah Indonesia
+            </div>
+            <form id="loginForm">
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Username</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="username" placeholder="Masukkan username" required validate
+                                        data-error-message="Username tidak boleh kosong" autocomplete="off">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Password</div>
+                                <div class="item-input-wrap">
+                                    <input type="password" name="password" placeholder="Masukkan password" required
+                                        validate data-error-message="Password tidak boleh kosong">
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="block">
+                    <a class="col-100 medium-50 button button-fill button-round" href="#" @click="login">Login</a>
+                    <br>
+                    <div class="row">
+                        <a href="/registrasi/" data-transition="f7-circle" class="button">Daftar</a>
+                        <a href="/reset/" data-transition="f7-circle" class="button">Lupa Password?</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+    // script must return component object
+    return {
+        methods: {
+            login: function () {
+                const form = $$('#loginForm');
+                if (form[0].checkValidity()) {
+                    const data = app.form.convertToData('#loginForm');
+
+                    app.request({
+                        type: "POST",
+                        url: `${URL}login/`,
+                        dataType: 'json',
+                        data: data,
+                        beforeSend: () => {
+                            app.preloader.show();
+                        },
+                        success: (res) => {
+                            app.preloader.hide();
+                            if (res[0]) {
+                                const hasLogin = res[1];
+                                localStorage.setItem('hasLogin', hasLogin);
+                                localStorage.setItem('id', res[2]);
+
+                                saveToken();
+
+                                app.dialog.alert('Anda berhasil login', 'Informasi');
+                                mainView.router.navigate(`/${hasLogin}/`, {
+                                    reloadAll: true
+                                });
+                            } else {
+                                app.dialog.alert('Username atau password salah', 'Informasi');
+                            }
+                        },
+                        error: (err) => {
+                            console.log(err);
+                            app.preloader.hide();
+                            app.dialog.preloader('Tidak dapat terhubung ke server...');
+                        }
+                    })
+
+                } else {
+                    app.dialog.alert('Username dan password tidak boleh kosong', 'Informasi');
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,202 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner sliding">
+                <div class="left"><a class="back"><i class="icon f7-icons">chevron_left</i>Kembali</a></div>
+                <div class="title">Registrasi</div>
+            </div>
+        </div>
+        <div class="page-content login-screen-content">
+            <form id="registrasiForm">
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nama</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="nama" placeholder="Masukkan nama" required validate
+                                        data-error-message="Nama tidak boleh kosong">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Username</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="username" id="username" placeholder="Masukkan username"
+                                        required validate data-error-message="Username tidak boleh kosong">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Password</div>
+                                <div class="item-input-wrap">
+                                    <input type="password" name="password" id="password" placeholder="Masukkan password"
+                                        required validate data-error-message="Password tidak boleh kosong">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Email</div>
+                                <div class="item-input-wrap">
+                                    <input type="email" name="email" id="email" placeholder="Masukkan email" required
+                                        validate>
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">No Telpon</div>
+                                <div class="item-input-wrap">
+                                    <input type="number" name="telp" id="telp" placeholder="Masukkan nomor telpon"
+                                        required validate data-error-message="Nomor Telpon tidak boleh kosong">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Jenis Kelamin</div>
+                                <div class="item-input-wrap">
+                                    <a class="item-link smart-select smart-select-init" data-open-in="sheet">
+                                        <select name="jenis_kelamin" required validate
+                                            data-error-message="Jenis kelamin belum dipilih">
+                                            <option value="Laki-laki" data-display-as="Laki-laki">
+                                                Laki-laki
+                                            </option>
+                                            <option value="Perempuan" data-display-as="Perempuan">
+                                                Perempuan
+                                        </select>
+                                        <div class="item-content">
+                                            <div class="item-title">Pilih Jenis Kelamin</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Tanggal Lahir</div>
+                                <div class="item-input-wrap">
+                                    <input type="date" name="tgl_lahir" placeholder="Masukkan tanggal lahir" required
+                                        validate data-error-message="Tanggal Lahir tidak boleh kosong">
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="block">
+                    <a class="col-100 medium-50 button button-fill button-round" href="#" @click="daftar">Daftar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+    // script must return component object
+    return {
+        methods: {
+            checkFormValidate: function () {
+                const form = $$('#registrasiForm');
+                const username = $$('#username').val();
+                const password = $$('#password').val();
+                const email = $$('#email').val();
+                const telp = $$('#telp').val();
+                let res = true;
+
+                if (username.length > 0 && username.length < 6) {
+                    this.markInputAsError(form, 'username', 'Username harus lebih dari 6 karakter');
+                    res = false;
+                } else {
+                    const cek = formProses.cekData('user', [{
+                        name: 'username'
+                    }, {
+                        value: username
+                    }]);
+
+                    if (JSON.parse(cek.response)) {
+                        this.markInputAsError(form, 'username', 'Username telah digunakan');
+                        res = false;
+                    }
+                }
+
+                if (password.length > 0 && password.length < 6) {
+                    this.markInputAsError(form, 'password', 'Password harus lebih dari 6 karakter');
+                    res = false;
+                }
+
+                if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+                    const cek = formProses.cekData('user', [{
+                        name: 'email'
+                    }, {
+                        value: email
+                    }]);
+
+                    if (JSON.parse(cek.response)) {
+                        this.markInputAsError(form, 'email', 'Email telah digunakan');
+                        res = false;
+                    }
+                }
+
+                if (telp.length > 0 && telp.length < 11) {
+                    this.markInputAsError(form, 'telp', 'Nomor telpon tidak valid');
+                    res = false;
+                }
+
+                return res;
+            },
+            markInputAsError: function (componentEl, inputName, message) {
+                var self = this;
+                var el = componentEl.find('input[name="' + inputName + '"]');
+                el.addClass('input-invalid');
+                el.parent().parent().parent().addClass('item-input-with-error-message item-input-invalid');
+                if (!el.next('.item-input-error-message').length) {
+                    self.$('<div class="item-input-error-message">' + message + '</div>').insertAfter(el);
+                } else {
+                    el.next('.item-input-error-message').html(message);
+                }
+            },
+            daftar: function () {
+                const form = $$('#registrasiForm');
+
+                if (this.checkFormValidate() && form[0].checkValidity()) {
+                    const data = app.form.convertToData('#registrasiForm');
+
+                    app.request({
+                        type: "POST",
+                        url: `${URL}registrasi/`,
+                        dataType: 'json',
+                        data: data,
+                        beforeSend: () => {
+                            app.preloader.show();
+                        },
+                        success: (res) => {
+                            app.preloader.hide();
+                            if (res) {
+                                app.dialog.alert('Data berhasil di registrasi', 'Informasi');
+                                mainView.router.back();
+                            } else {
+                                app.dialog.alert('Data gagal di registrasi', 'Informasi');
+                            }
+                        },
+                        error: (err) => {
+                            console.log(err);
+                            app.preloader.hide();
+                            app.dialog.preloader('Terjadi masalah diserver...');
+                        }
+                    })
+
+                } else {
+                    app.dialog.alert('Perbaiki data yang anda masukkan', 'Informasi');
+                }
+            }
+        }
+    }
+</script>

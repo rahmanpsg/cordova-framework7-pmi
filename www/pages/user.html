@@ -1,0 +1,435 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="right">
+                    <a class="link popover-open" href="#" data-popover=".popover-links">
+                        <i class="f7-icons">ellipsis_vertical</i>
+                    </a>
+                </div>
+                <div class="title">UTD PALANG MERAH INDONESIA</div>
+            </div>
+        </div>
+
+        <div class="toolbar tabbar tabbar-labels toolbar-bottom">
+            <div class="toolbar-inner">
+                <a href="#view-home" class="tab-link tab-link-active">
+                    <i class="icon f7-icons">house_alt</i>
+                    <span class="tabbar-label">Beranda</span>
+                </a>
+                <a href="#view-pmi" class="tab-link">
+                    <i class="icon f7-icons">drop</i>
+                    <span class="tabbar-label">Stok Darah</span>
+                </a>
+                <a href="#view-permintaan" class="tab-link">
+                    <i class="icon f7-icons">cart
+                        {{#if totalPermintaan}}<span class="badge color-yellow">{{totalPermintaan}}</span>{{/if}}
+                    </i>
+                    <span class="tabbar-label">Permintaan</span>
+                </a>
+                <a href="#view-profil" class="tab-link">
+                    <i class="icon f7-icons">person_alt</i>
+                    <span class="tabbar-label">Profil</span>
+                </a>
+            </div>
+        </div>
+        <div class="tabs-swipeable-wrap">
+            <div class="tabs">
+                <div id="view-home" class="page-content tab tab-active">
+                    <div class="card">
+                        <div class="card-content card-content-padding text-align-center">
+                            <p><img src="./assets/logo.png" width="130" class="lazy lazy-fade-in"></p>
+                            <b style="font-size: 27px;">Palang Merah Indonesia</b>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><b>Visi dan Misi PMI</b></div>
+                        <div class="card-content card-content-padding">
+                            <p><b>Visi</b></p>
+                            PMI yang berkarakter, profesional, mandiri dan dicintai
+                            masyarakat
+                            <p><b>Misi</b></p>
+                            <ol>
+                                <li>
+                                    Menjadi organisasi kemanusiaan terdepan yang memberikan <b>layanan
+                                        berkualitas</b> melalui kerja sama dengan masyarakat dan mitra
+                                    sesuai dengan <b>prinsip-prinsip dasar</b> Gerakan Palang Merah dan
+                                    Bulan Sabit Merah.
+                                </li>
+                                <li>
+                                    Meningkatkan kemandirian organisasi PMI melalui <b>kemitraan
+                                        stategis</b> yang berkesinambungan dengan pemerintah, swasta, mitra
+                                    gerakan dan pemangku kepentingan lainnya di semua tingkatan.
+                                </li>
+                                <li>
+                                    Meningkatkan <b>reputasi organisasi</b> PMI di tingkat Nasional dan
+                                    Internasional.
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-pmi" class="page-content tab ptr-content">
+                    <div class="ptr-preloader">
+                        <div class="preloader"></div>
+                        <div class="ptr-arrow"></div>
+                    </div>
+                    <div class="list-block">
+                        <div class="card">
+                            <div class="card-header"><b>Daftar UTD PMI</b></div>
+                            <div class="card-content card-content-padding">
+                                <div class="list links-list" id="listPMI">
+                                    <ul>
+                                        {{#each DataPMI}}
+                                        <li>
+                                            <a href="/stok/{{id}}/{{nama}}/" data-transition="f7-dive"
+                                                class="item-content">
+                                                <div class="item-media">
+                                                    <img src="./assets/logo.png" width="25" class="lazy lazy-fade-in">
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">{{nama}}</div>
+                                                    <div class="item-after">
+                                                        <span class="badge custom-badge color-red">
+                                                            Total Stok : {{total}} Kantong
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        {{else}}
+                                        <div class="block">
+                                            Tidak ada data
+                                        </div>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-permintaan" class="page-content tab ptr-content">
+                    <div class="ptr-preloader">
+                        <div class="preloader"></div>
+                        <div class="ptr-arrow"></div>
+                    </div>
+                    <div class="list-block">
+                        <div class="card">
+                            <div class="card-header"><b>Daftar Permintaan Darah</b></div>
+                            <div class="card-content card-content-padding">
+                                <div class="list media-list" id="listPMI">
+                                    <ul>
+                                        {{#each ListPermintaan}}
+                                        <li>
+                                            <a href="/permintaan/{{id}}/{{nama}}/{{jumlah}}/{{gol_darah}}/"
+                                                data-transition="f7-dive" class="item-link item-content">
+                                                <div class="item-media">
+                                                    <div class="badge badge_gol_darah color-red">
+                                                        <b>{{gol_darah}}</b>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">{{nama}}</div>
+                                                        <div class="item-after">
+                                                            <div class="chip color-lime">
+                                                                {{jumlah}} Kantong
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="item-text">
+                                                        {{last_update}}
+                                                    </div>
+                                                    <div class="item-subtitle">
+                                                        {{#js_if "this.status == null"}}
+                                                        Silahkan upload surat pengantar
+                                                        {{else}}
+                                                        Status : <i>{{this.status}}</i>
+                                                        {{/js_if}}
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        {{else}}
+                                        <div class="block">
+                                            Tidak ada data
+                                        </div>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-profil" class="page-content tab">
+                    <div class="card">
+                        <div class="card-header"><b>Profil</b></div>
+                        <div class="card-content card-content-padding">
+                            <div class="list">
+                                <ul>
+                                    <!-- skeleton -->
+                                    {{#if loading}}
+                                    <li class="item-content skeleton-text skeleton-effect-blink">
+                                        <div class="item-media"><i class="icon f7-icons">person</i></div>
+                                        <div class="item-inner">
+                                            <div class="item-title">
+                                                <div class="item-header">Nama</div>
+                                                Abd Rahman
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content skeleton-text skeleton-effect-blink">
+                                            <div class="item-media"><i class="icon f7-icons">person_circle</i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Username</div>
+                                                    rahmanpsg
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content skeleton-text skeleton-effect-blink">
+                                            <div class="item-media"><i class="icon f7-icons">phone</i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Nomor Telpon</div>
+                                                    085255255255
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content skeleton-text skeleton-effect-blink">
+                                            <div class="item-media"><i class="icon f7-icons">calendar</i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Tanggal Lahir</div>
+                                                    02 Mei 1996
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content skeleton-text skeleton-effect-blink">
+                                            <div class="item-media"><i class="icon f7-icons">person_crop_square</i>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Jenis Kelamin</div>
+                                                    Laki-laki
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content skeleton-text skeleton-effect-blink">
+                                            <div class="item-media"><i class="icon f7-icons">at</i></div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Email</div>
+                                                    rahmanpsg014gmail.com
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {{else}}
+                                    <!-- /skeleton -->
+                                    {{profilHelper dataProfil}}
+                                    {{/if}}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fab fab-extended fab-right-bottom color-red">
+                        <a href="#" @click="updateProfil">
+                            <i class="icon f7-icons">pencil_ellipsis_rectangle</i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="popover popover-links">
+            <div class="popover-inner">
+                <div class="list">
+                    <ul>
+                        <li><a class="list-button item-link popover-close" @click="logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<style>
+    .badge_gol_darah {
+        --f7-badge-size: 70px;
+        --f7-badge-font-size: 33px;
+    }
+</style>
+
+<script>
+    // script must return component object
+    return {
+        data: function () {
+            const dataPMI = localStorage.getItem('dataPMI') != '' ? JSON.parse(localStorage.getItem('dataPMI')) :
+                null;
+            const dataProfil = localStorage.getItem('dataProfil') != '' ? JSON.parse(localStorage.getItem(
+                    'dataProfil')) :
+                null;
+
+            const res = {
+                // loading: true,
+                dataProfil,
+                ...dataPMI
+            }
+
+            return res;
+        },
+        on: {
+            pageInit: function () {
+                let self = this;
+
+                this.getListPMI();
+                this.getTotalNotifikasi();
+                this.getListPermintaan();
+                this.getDataProfil();
+
+                $$('#view-pmi').on('ptr:refresh', () => {
+                    this.getListPMI();
+                });
+
+                $$('#view-permintaan').on('ptr:refresh', () => {
+                    this.getListPermintaan();
+                    this.getTotalNotifikasi();
+                });
+
+                this.$app.on('getTotalNotifikasi', this.getTotalNotifikasi);
+                this.$app.on('getListPermintaan', this.getListPermintaan);
+                this.$app.on('updateDataProfil', this.updateDataProfil);
+            },
+            pageBeforeRemove: function (e, page) {
+                this.$app.off('getTotalNotifikasi', this.getTotalNotifikasi);
+                this.$app.off('getListPermintaan', this.getListPermintaan);
+                this.$app.off('updateDataProfil', this.updateDataProfil);
+            }
+        },
+        methods: {
+            getListPMI: function () {
+                let self = this;
+                app.progressbar.show('white');
+                app.request.promise.get(`${URL}getListDataPMI`, '', 'json').then((res) => {
+                    app.progressbar.hide();
+                    const DataPMI = res.data;
+                    self.$setState({
+                        DataPMI
+                    });
+                    localStorage.setItem('DataPMI', JSON.stringify(DataPMI));
+                    app.ptr.get('#view-pmi').done();
+                }).catch((err) => {
+                    console.log(err);
+                    app.progressbar.hide();
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            getTotalNotifikasi: function () {
+                let self = this;
+                app.progressbar.show('white');
+                const user = localStorage.getItem('id');
+                app.request.promise.get(`${URL}getTotalNotikasiPermintaan/${user}`, '', 'json').then((res) => {
+                    app.progressbar.hide();
+                    const totalPermintaan = res.data > 0 ? res.data : null;
+
+                    self.$setState({
+                        totalPermintaan
+                    });
+
+                    localStorage.setItem('totalPermintaan', JSON.stringify(totalPermintaan));
+                }).catch((err) => {
+                    console.log(err);
+                    app.progressbar.hide();
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            getListPermintaan: function () {
+                let self = this;
+                app.progressbar.show('white');
+                const user = localStorage.getItem('id');
+                app.request.promise.get(`${URL}getListPermintaan/${user}`, '', 'json').then((res) => {
+                    app.progressbar.hide();
+                    const ListPermintaan = res.data;
+
+                    self.$setState({
+                        ListPermintaan
+                    });
+
+                    localStorage.setItem('ListPermintaan', JSON.stringify(ListPermintaan));
+                    app.ptr.get('#view-permintaan').done();
+                }).catch((err) => {
+                    console.log(err);
+                    app.progressbar.hide();
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            getDataProfil: function () {
+                let self = this;
+                const user = localStorage.getItem('id');
+                self.$setState({
+                    loading: true
+                });
+                app.request.promise.get(`${URL}getDataProfil/${user}`, '', 'json').then((res) => {
+                    const dataProfil = res.data;
+
+                    self.$setState({
+                        dataProfil,
+                        loading: false
+                    });
+
+                    localStorage.setItem('dataProfil', JSON.stringify(dataProfil));
+                }).catch((err) => {
+                    console.log(err);
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            updateDataProfil: function (dataProfil = '') {
+                if (dataProfil == '') {
+                    this.$setState({
+                        loading: true
+                    });
+                } else {
+                    this.$setState({
+                        loading: false,
+                        dataProfil
+                    });
+                }
+
+            },
+            updateProfil: function () {
+                mainView.router.navigate({
+                    name: 'profil',
+                    params: {
+                        dataProfil: JSON.stringify(this.dataProfil)
+                    },
+                });
+            },
+            logout: () => {
+                localStorage.removeItem('hasLogin');
+                FirebasePlugin.unregister();
+
+                mainView.router.navigate('/login/', {
+                    reloadAll: true
+                });
+            }
+        }
+    }
+</script>

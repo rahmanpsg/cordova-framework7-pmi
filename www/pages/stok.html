@@ -1,0 +1,244 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left"><a class="back"><i class="icon f7-icons">chevron_left</i>Kembali</a></div>
+                <div class="title">Stok Darah</div>
+            </div>
+        </div>
+
+        <div class="page-content ptr-content" id="view-stok">
+            <div class="ptr-preloader">
+                <div class="preloader"></div>
+                <div class="ptr-arrow"></div>
+            </div>
+            <div class="block-title block-title-large">UTD {{nama}}</div>
+            <div class="block-header">Terakhir diupdate : {{tanggalHelper last_update}}
+                <div class="text-align-right">
+                    <a class="tooltip-init"
+                        data-tooltip="<em>Geser ke kiri pada<br> golongan darah <br>untuk melihat aksi</em>">
+                        <i class="icon f7-icons">info_circle</i>
+                    </a>
+                </div>
+            </div>
+            <div class="list media-list">
+                <ul>
+                    {{#if loading}}
+                    {{#each '12345678'}}
+                    <li class="item-content skeleton-text skeleton-effect-blink">
+                        <div class="item-link item-content">
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title text-align-left">
+                                        Golongan Darah aaaaaaaaaaaa
+                                    </div>
+                                    <div class="item-after text-align-right">
+                                        total kantong
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {{/each}}
+                    {{else}}
+                    {{#each dataStok}}
+                    <li class="swipeout" data-index="{{@index}}" data-gol_darah="{{gol_darah}}">
+                        <div class="swipeout-content">
+                            <a href="#" class="item-link item-content">
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title" id="itemGolDarah">Golongan Darah
+                                            <div class="chip color-red">
+                                                <div class="chip-label chip_gol_darah"><b>{{gol_darah}}</b></div>
+                                            </div>
+                                        </div>
+                                        <div class="item-after">
+                                            <div class="chip color-lime">
+                                                {{cekTotal total}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="swipeout-actions-right">
+                            <a class="color-blue" data-total="{{total}}" data-gol_darah="{{gol_darah}}"
+                                @click="aksiPesan"><i class="icon f7-icons">cart_fill_badge_plus</i>
+                                &nbsp;Pesan darah</a>
+                        </div>
+                    </li>
+                    {{else}}
+                    <div class="block">
+                        Tidak ada data
+                    </div>
+                    {{/each}}
+                    {{/if}}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Swipe to step sheet -->
+        <div class="sheet-modal my-sheet-pesan-darah" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="sheet-modal-inner">
+                <div class="sheet-modal-swipe-step">
+                    <div class="display-flex padding justify-content-space-between align-items-center">
+                        <div style="font-size: 18px"><b>Jumlah:</b></div>
+                        <!-- <div style="font-size: 22px"> -->
+                        <form id="pesanForm">
+                            <input type="hidden" name="dari">
+                            <input type="hidden" name="kepada" value="{{id}}">
+                            <input type="hidden" name="gol_darah">
+                            <input type="hidden" id="max_total">
+                            <!-- <input type="number" name="jumlah" placeholder="Masukkan jumlah darah" min="1" required
+                                    validate> -->
+                            <div class="stepper stepper-fill stepper-init" data-wraps="true" data-autorepeat="true">
+                                <div class="stepper-button-minus"></div>
+                                <div class="stepper-input-wrap">
+                                    <input type="number" name="jumlah" value="1" min="0" max="" step="1">
+                                </div>
+                                <div class="stepper-button-plus"></div>
+                            </div>
+                        </form>
+                        <!-- </div> -->
+                    </div>
+                    <div class="padding-horizontal padding-bottom">
+                        <a class="button button-large button-fill" @click="pesanDarah"><i
+                                class="icon f7-icons">cart_fill_badge_plus</i> Pesan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+<style>
+    .page {
+        background-color: #fff;
+    }
+
+    .chip_gol_darah {
+        width: 50px;
+        text-align: center;
+    }
+
+    .chip_gol_darah b {
+        font-size: 20px;
+    }
+</style>
+<!-- rest of component data and methods -->
+<script>
+    // script must return component object
+    return {
+        data: function () {
+            return {
+                loading: true,
+            };
+        },
+        on: {
+            pageInit: function (e) {
+                let self = this;
+
+                const params = this.$route.params;
+                this.$setState(params);
+
+                this.getDataStok(params.id);
+                this.getLastUpdate(params.id);
+
+                $$('#view-stok').on('ptr:refresh', () => {
+                    this.getLastUpdate(params.id);
+                    this.getDataStok(params.id);
+                });
+
+                app.sheet.create({
+                    el: '.my-sheet-pesan-darah',
+                    swipeToClose: true,
+                    swipeToStep: true,
+                    backdrop: true,
+                });
+            }
+        },
+        methods: {
+            getDataStok: function (id) {
+                this.$setState({
+                    loading: true,
+                });
+                app.request.promise.get(`${URL}getDataStok/${id}`, '', 'json').then((res) => {
+                    const dataStok = res.data;
+                    this.$setState({
+                        dataStok,
+                        loading: false
+                    });
+                    app.ptr.get('#view-stok').done();
+                }).catch((err) => {
+                    console.log(err);
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            getLastUpdate: function (id) {
+                app.request.promise.get(`${URL}getLastUpdate/${id}`, '', 'json').then((res) => {
+                    const last_update = res.data;
+                    this.$setState({
+                        last_update
+                    });
+                }).catch((err) => {
+                    console.log(err);
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            aksiPesan: function (e) {
+                const gol_darah = $$(e.target).data('gol_darah');
+                const total = $$(e.target).data('total');
+
+                if (gol_darah !== undefined) {
+                    if (total > 0) {
+                        $$('input[name=dari]').val(localStorage.getItem('id'))
+                        $$('input[name=gol_darah]').val(gol_darah);
+                        $$('input[id=max_total]').val(total);
+                        app.stepper.setValue('.stepper', 1);
+                        const stepper = app.stepper.get('.stepper');
+                        stepper.max = parseInt(total);
+                        app.sheet.open('.my-sheet-pesan-darah');
+                    } else {
+                        app.dialog.alert(`Maaf, stok darah ${gol_darah} sedang kosong`, 'Informasi');
+                    }
+                }
+            },
+            pesanDarah: function (e) {
+                let self = this;
+                const form = $$('#pesanForm');
+
+                if (form[0].checkValidity()) {
+                    const data = app.form.convertToData('#pesanForm');
+                    const max_jumlah = $$('input[id=max_total]').val();
+
+                    if (parseInt(data.jumlah) > parseInt(max_jumlah)) {
+                        app.dialog.alert('Maaf, jumlah pesanan anda melebihi stok yang tersedia', 'Informasi');
+                    } else {
+                        app.dialog.confirm(`Anda akan memesan ${data.jumlah} kantong darah ${data.gol_darah}?`,
+                            'Informasi',
+                            function () {
+                                app.preloader.show();
+
+                                data['id'] = generateID('tbl_permintaan', 'PER');
+                                formProses.tambah('permintaan', data).then(res => {
+                                    app.preloader.hide();
+                                    app.sheet.close();
+
+                                    // emit global app event
+                                    app.emit('getTotalNotifikasi');
+                                    app.emit('getListPermintaan');
+
+                                    app.dialog.alert(
+                                        'Silahkan lengkapi data pesanan anda di menu permintaan',
+                                        'Berhasil');
+                                })
+                            })
+                    }
+                } else {
+                    app.dialog.alert('Jumlah pesanan tidak valid', 'Gagal');
+                }
+            }
+        }
+    }
+</script>

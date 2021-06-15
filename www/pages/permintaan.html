@@ -1,0 +1,169 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left"><a class="back"><i class="icon f7-icons">chevron_left</i>Kembali</a></div>
+                <div class="title">Permintaan Darah</div>
+            </div>
+        </div>
+        {{#js_if "this.status == null"}}
+        <div class="fab fab-extended fab-left-bottom color-red">
+            <a href="#" @click="uploadFile">
+                <i class="icon f7-icons">cloud_upload</i>
+                <div class="fab-text">Upload</div>
+            </a>
+        </div>
+        {{/js_if}}
+
+        <form action="{{URL}}" id="permintaanForm" method="POST" enctype="multipart/form-data">
+            <input type="text" name="id" value="{{id}}">
+            <input type="file" name="file" accept="image/png, image/jpeg, image/jpg" @change="submitPermintaan">
+        </form>
+
+        <div class="page-content">
+            <div class="block-title block-title-large">UTD {{pmi}}</div>
+            <div class="block">
+                <p><b>Golongan Darah</b> : {{gol_darah}}</p>
+                <p><b>Total Pesanan</b> : {{jumlah}} Kantong</p>
+
+                {{if tanggalHistory}}
+                {{historyHelper tanggalHistory}}
+                {{/if}}
+
+                {{#js_if "this.status == null"}}
+                <p>Silahkan upload surat pengantar</p>
+                {{else}}
+                <p>{{statusHelper this.status this.pmi}}</p>
+                {{/js_if}}
+            </div>
+        </div>
+
+        <!-- Swipe to step sheet -->
+        <div class="sheet-modal my-sheet-pesan-darah" style="height:auto; --f7-sheet-bg-color: #fff;">
+            <div class="sheet-modal-inner">
+                <div class="sheet-modal-swipe-step">
+                    <div class="display-flex padding justify-content-space-between align-items-center">
+                        <div style="font-size: 18px"><b>Jumlah:</b></div>
+                        <!-- <div style="font-size: 22px"> -->
+                        <form id="pesanForm">
+                            <input type="hidden" name="id">
+                            <input type="hidden" name="dari">
+                            <input type="hidden" name="kepada" value="{{id}}">
+                            <input type="hidden" name="gol_darah">
+                            <input type="hidden" id="max_total">
+                            <!-- <input type="number" name="jumlah" placeholder="Masukkan jumlah darah" min="1" required
+                                    validate> -->
+                            <div class="stepper stepper-fill stepper-init" data-wraps="true" data-autorepeat="true">
+                                <div class="stepper-button-minus"></div>
+                                <div class="stepper-input-wrap">
+                                    <input type="number" name="jumlah" value="1" min="1" max="" step="1">
+                                </div>
+                                <div class="stepper-button-plus"></div>
+                            </div>
+                        </form>
+                        <!-- </div> -->
+                    </div>
+                    <div class="padding-horizontal padding-bottom">
+                        <a class="button button-large button-fill"><i class="icon f7-icons">cart_fill_badge_plus</i>
+                            Pesan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+<style>
+    .page {
+        background-color: #fff;
+    }
+
+    .chip_gol_darah {
+        width: 50px;
+        text-align: center;
+    }
+
+    .chip_gol_darah b {
+        font-size: 20px;
+    }
+</style>
+<!-- rest of component data and methods -->
+<script>
+    // script must return component object
+    return {
+        data: function () {
+            return null;
+        },
+        on: {
+            pageInit: function (e) {
+                let self = this;
+
+                this.$setState(this.$route.params)
+
+                this.getDataPermintaan();
+
+                self.$setState({
+                    URL: URL + 'uploadSuratPengantar'
+                });
+            }
+        },
+        methods: {
+            getDataPermintaan: function () {
+                app.preloader.show();
+                app.request.promise.get(`${URL}getDataPermintaan/${this.$route.params.id}`, '', 'json').then((
+                    res) => {
+                    const tanggalHistory = JSON.parse(res.data.tanggalHistory);
+
+                    const dataPermintaan = Object.assign(res.data, {
+                        tanggalHistory
+                    });
+
+                    this.$setState(dataPermintaan);
+
+                    app.preloader.hide();
+                }).catch((err) => {
+                    console.log(err);
+                    app.preloader.hide();
+                    app.dialog.preloader('Tidak dapat terhubung ke server...');
+                })
+            },
+            uploadFile: function () {
+                $$('input[name=file]').click();
+            },
+            submitPermintaan: function () {
+                let self = this;
+                app.dialog.confirm(
+                    'Pastikan file yang anda pilih telah sesuai, file tidak dapat diubah setelah diupload ',
+                    'Informasi',
+                    () => {
+                        const form = $$('#permintaanForm')[0];
+                        var formData = new FormData(form);
+
+                        app.dialog.preloader('Mengupload file...');
+
+                        formProses.upload(formData).then((res) => {
+                            app.dialog.close();
+                            if (res.data[0]) {
+                                app.dialog.alert('File berhasil diupload', 'Berhasil');
+                                self.$setState(res.data[1]);
+
+                                // emit global app event
+                                app.emit('getTotalNotifikasi');
+                                app.emit('getListPermintaan');
+                            } else {
+                                app.dialog.alert(res.data[1], 'Gagal');
+                            }
+                        }).catch((err) => {
+                            app.dialog.close();
+                            app.dialog.alert('Tidak dapat terhubung ke server', 'Gagal');
+                            console.log(err);
+                        })
+                    },
+                    () => {
+                        $$('input[name=file]').val('');
+                    })
+            }
+        }
+    }
+</script>

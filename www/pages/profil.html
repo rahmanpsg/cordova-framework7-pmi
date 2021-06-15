@@ -1,0 +1,222 @@
+<template>
+    <div class="page">
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left"><a class="back"><i class="icon f7-icons">chevron_left</i>Kembali</a></div>
+                <div class="title">Profile</div>
+            </div>
+        </div>
+
+        <div class="fab fab-extended fab-right-bottom color-red">
+            <a href="#" @click="simpanProfil">
+                <i class="icon f7-icons">checkmark_alt</i>
+            </a>
+        </div>
+
+        <div class="page-content login-screen-content">
+            <form id="profilForm">
+                <div class="list">
+                    <ul>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Nama</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="nama" placeholder="Masukkan nama" required validate
+                                        data-error-message="Nama tidak boleh kosong" value="{{nama}}">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Username</div>
+                                <div class="item-input-wrap">
+                                    <input type="text" name="username" id="username" placeholder="Masukkan username"
+                                        required validate data-error-message="Username tidak boleh kosong"
+                                        value="{{username}}">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Password</div>
+                                <div class="item-input-wrap">
+                                    <input type="password" name="password" id="password" placeholder="Masukkan password"
+                                        required validate data-error-message="Password tidak boleh kosong"
+                                        value="{{password}}">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Email</div>
+                                <div class="item-input-wrap">
+                                    <input type="email" name="email" id="email" placeholder="Masukkan email" required
+                                        validate value="{{email}}">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">No Telpon</div>
+                                <div class="item-input-wrap">
+                                    <input type="number" name="telp" id="telp" placeholder="Masukkan nomor telpon"
+                                        required validate data-error-message="Nomor Telpon tidak boleh kosong"
+                                        value="{{telp}}">
+                                    <span class="input-clear-button"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Jenis Kelamin</div>
+                                <div class="item-input-wrap">
+                                    <a class="item-link smart-select smart-select-init" data-open-in="sheet">
+                                        <select name="jenis_kelamin" required validate
+                                            data-error-message="Jenis kelamin belum dipilih" value="{{jenis_kelamin}}">
+                                            <option value="Laki-laki" data-display-as="Laki-laki">
+                                                Laki-laki
+                                            </option>
+                                            <option value="Perempuan" data-display-as="Perempuan">
+                                                Perempuan
+                                        </select>
+                                        <div class="item-content">
+                                            <div class="item-title">Pilih Jenis Kelamin</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="item-content item-input">
+                            <div class="item-inner">
+                                <div class="item-title item-label">Tanggal Lahir</div>
+                                <div class="item-input-wrap">
+                                    <input type="date" name="tgl_lahir" placeholder="Masukkan tanggal lahir" required
+                                        validate data-error-message="Tanggal Lahir tidak boleh kosong"
+                                        value="{{tgl_lahir}}">
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+            </form>
+        </div>
+    </div>
+</template>
+<script>
+    return {
+        data: function () {
+            return null;
+        },
+        on: {
+            pageInit: function () {
+                let self = this;
+
+                this.$setState(JSON.parse(this.$route.params.dataProfil))
+            }
+        },
+        methods: {
+            checkFormValidate: function () {
+                const form = $$('#profilForm');
+                const username = $$('#username').val();
+                const password = $$('#password').val();
+                const email = $$('#email').val();
+                const telp = $$('#telp').val();
+                let res = true;
+
+                if (username.length > 0 && username.length < 6) {
+                    this.markInputAsError(form, 'username', 'Username harus lebih dari 6 karakter');
+                    res = false;
+                } else {
+                    if (username !== this.username) {
+                        const cek = formProses.cekData('user', [{
+                            name: 'username'
+                        }, {
+                            value: username
+                        }]);
+
+                        if (JSON.parse(cek.response)) {
+                            this.markInputAsError(form, 'username', 'Username telah digunakan');
+                            res = false;
+                        }
+                    }
+                }
+
+                if (password.length > 0 && password.length < 6) {
+                    this.markInputAsError(form, 'password', 'Password harus lebih dari 6 karakter');
+                    res = false;
+                }
+                if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+                    if (email !== this.email) {
+                        const cek = formProses.cekData('user', [{
+                            name: 'email'
+                        }, {
+                            value: email
+                        }]);
+
+                        if (JSON.parse(cek.response)) {
+                            this.markInputAsError(form, 'email', 'Email telah digunakan');
+                            res = false;
+                        }
+                    }
+
+                }
+
+                if (telp.length > 0 && telp.length < 11) {
+                    this.markInputAsError(form, 'telp', 'Nomor telpon tidak valid');
+                    res = false;
+                }
+
+                app.preloader.hide();
+
+                return res;
+            },
+            markInputAsError: function (componentEl, inputName, message) {
+                var self = this;
+                var
+                    el = componentEl.find('input[name="' + inputName + '" ]');
+                el.addClass('input-invalid');
+                el.parent().parent().parent().addClass('item-input-with-error-message item-input-invalid');
+                if (!el.next('.item-input-error-message').length) {
+                    self.$('<div class="item-input-error-message">' +
+                        message + '</div>').insertAfter(el);
+                } else {
+                    el.next('.item-input-error-message').html(message);
+                }
+            },
+            simpanProfil: function () {
+                const form = $$('#profilForm');
+                app.preloader.show();
+                if (this.checkFormValidate() && form[0].checkValidity()) {
+                    app.dialog.confirm(
+                        'Anda yakin untuk mengubah profil?',
+                        'Informasi',
+                        () => {
+                            const id = localStorage.getItem('id');
+                            const data = app.form.convertToData('#profilForm');
+
+                            app.emit('updateDataProfil');
+                            mainView.router.back();
+                            formProses.update('user', data, {
+                                id
+                            }).then(res => {
+                                if (res.data[0]) {
+                                    app.dialog.alert('Data berhasil diubah', 'Informasi');
+                                    app.emit('updateDataProfil', res.data[1]);
+                                } else {
+                                    app.dialog.alert('Data gagal diubah', 'Informasi');
+                                }
+                            }).catch(err => {
+                                console.log(err);
+                            })
+                        })
+                } else {
+                    app.dialog.alert('Perbaiki data yang anda masukkan', 'Informasi');
+                }
+            }
+        }
+    }
+</script>
